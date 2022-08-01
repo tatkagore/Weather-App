@@ -32,7 +32,7 @@
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </textAttributes>
                                 <items>
-                                    <navigationItem title="Weather" id="2bg-eR-cd2">
+                                    <navigationItem id="2bg-eR-cd2">
                                         <barButtonItem key="rightBarButtonItem" style="plain" id="wlp-oA-r7B">
                                             <button key="customView" opaque="NO" contentMode="scaleToFill" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="CzF-yF-f1o">
                                                 <rect key="frame" x="364" y="7" width="30" height="30"/>
