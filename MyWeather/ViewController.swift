@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreLocation
+import MapKit
 
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
@@ -14,21 +15,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet var table: UITableView!
     @IBOutlet var navbar: UINavigationBar!
     @IBOutlet var menuButton: UIButton!
-    @IBOutlet var celsiusButton: UIMenuElement!
-    @IBOutlet var fahrenheitButton: UIMenuElement!
-    
-    @IBAction func changeTemperaturePreference(_ sender: UIMenuElement) {
-        
-//        NOT WORKING
-//        celsiusButton = UIAction(title: "Celsius", state: sender.title == "Celsius" ? .on : .off, handler: {(_) in })
-//        fahrenheitButton = UIAction(title: "Celsius", state: sender.title ==  "Celsius" ? .off : .on, handler: {(_) in })
-
-        unitIsCelsius = sender.title == "Celsius" ? true : false
-        DispatchQueue.main.async {
-            self.table.reloadData()
-            self.table.tableHeaderView = self.createTableHeader()
-        }
-    }
     
     var dailyModels = [DailyWeather]()
     var hourlyModels = [HourlyWeather]()
@@ -39,22 +25,57 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var current: CurrentWeather?
     var unitIsCelsius = true
     
+    private lazy var celsius = UIAction(title: "Celsius", image: UIImage(named: "celsius"), state: .on) { action in
+        self.changeTempUnit(unit: "Celsius")
+    }
+    
+    private lazy var fahrenheit = UIAction(title: "Fahrenheit", image: UIImage(named: "fahrenheit"), state: .off) { action in
+        self.changeTempUnit(unit: "Fahrenheit")
+    }
+    
+    private lazy var elements: [UIAction] = [celsius, fahrenheit]
+    private lazy var menu = UIMenu(title: "Choose units of measure", children: elements)
+    
+    
+    func changeTempUnit(unit: String) {
+        unitIsCelsius = unit == "Celsius" ? true : false
+        // Reload tableview
+        DispatchQueue.main.async {
+            self.table.reloadData()
+            self.table.tableHeaderView = self.createTableHeader()
+        }
+        // Recreate menu with good states
+        celsius = UIAction(title: "Celsius", image: UIImage(named: "celsius"), state: unitIsCelsius ? .on : .off) { action in
+            self.changeTempUnit(unit: "Celsius")
+        }
+        fahrenheit = UIAction(title: "Fahrenheit", image: UIImage(named: "fahrenheit"), state: unitIsCelsius ? .off : .on) { action in
+            self.changeTempUnit(unit: "Fahrenheit")
+        }
+        elements = [celsius, fahrenheit]
+        menu = UIMenu(title: "Choose units of measure", children: elements)
+        menuButton.menu = menu
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //Register 2 cells
         table.register(HourlyContainerCell.nib(), forCellReuseIdentifier: HourlyContainerCell.identifier)
         table.register(DailyContainerCell.nib(), forCellReuseIdentifier: DailyContainerCell.identifier)
         
         table.delegate = self
         table.dataSource = self
-        
+        table.contentInsetAdjustmentBehavior = .never
         table.backgroundColor = .clear
+        table.allowsSelection = false
+        
         navbar.backgroundColor = .clear
         navbar.setBackgroundImage(UIImage(), for: .default)
         navbar.shadowImage = UIImage()
         navbar.isTranslucent = true
+        
         self.view.backgroundColor = .clear
+        
+        menuButton.menu = menu
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -62,7 +83,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         setupLocation()
     }
     
-    // Location
     func setupLocation() {
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
@@ -110,13 +130,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         guard let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=\(lat)&lon=\(long)&appid=\(key)") else { fatalError("Missing URL") }
         
         URLSession.shared.dataTask(with: url, completionHandler: {data, response, error in
-            // Validation
             guard let data = data, error == nil else {
                 print("something went wrong")
                 return
             }
             
-            //convert data to models/some object
+            // Convert data to models/some object
             var json: WeatherResponse?
             do {
                 json = try JSONDecoder().decode(WeatherResponse.self, from: data)
@@ -128,12 +147,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             guard let result = json else {
                 return
             }
-                
+            
             self.dailyModels = result.daily
             self.current = result.current
             self.hourlyModels = result.hourly
-
-            // Update user interface
+            
+            // Update table
             DispatchQueue.main.async {
                 self.table.reloadData()
                 self.table.tableHeaderView = self.createTableHeader()
@@ -177,11 +196,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return headerView
     }
     
-    //Table
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }

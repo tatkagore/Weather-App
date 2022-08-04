@@ -95,6 +95,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		41187B2B28994DC8009D351C /* MapKit */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = MapKit;
+			sourceTree = "<group>";
+		};
 		4151DF3A2898071900C45B11 /* DailyCollectionViewCell */ = {
 			isa = PBXGroup;
 			children = (
@@ -145,6 +152,7 @@
 		41D221882889B5230019CD2F /* MyWeather */ = {
 			isa = PBXGroup;
 			children = (
+				41187B2B28994DC8009D351C /* MapKit */,
 				4151DF3A2898071900C45B11 /* DailyCollectionViewCell */,
 				41F1B4AA289806B2009376A0 /* DailyContainerCell */,
 				41BA8C052892D8EB0070F063 /* HourlyCollectionViewCell */,

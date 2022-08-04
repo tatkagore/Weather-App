@@ -20,6 +20,7 @@ class HourlyContainerCell: UITableViewCell, UICollectionViewDelegate, UICollecti
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.layer.cornerRadius = 10.0
+        collectionView.alpha = 0.9
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
