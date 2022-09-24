@@ -10,11 +10,12 @@ import CoreLocation
 import MapKit
 
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
+class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
     
     @IBOutlet var table: UITableView!
     @IBOutlet var navbar: UINavigationBar!
     @IBOutlet var menuButton: UIButton!
+
     
     var dailyModels = [DailyWeather]()
     var hourlyModels = [HourlyWeather]()
@@ -32,10 +33,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     private lazy var fahrenheit = UIAction(title: "Fahrenheit", image: UIImage(named: "fahrenheit"), state: .off) { action in
         self.changeTempUnit(unit: "Fahrenheit")
     }
-    
+    let screenSize: CGRect = UIScreen.main.bounds
+    let toolbarHeight: CGFloat = 70
     private lazy var elements: [UIAction] = [celsius, fahrenheit]
     private lazy var menu = UIMenu(title: "Choose units of measure", children: elements)
-    
+    private lazy var toolBar = UIToolbar(frame: CGRect(x: 0, y: screenSize.height - toolbarHeight, width: self.view.frame.size.width, height: toolbarHeight))
+
     
     func changeTempUnit(unit: String) {
         unitIsCelsius = unit == "Celsius" ? true : false
@@ -72,15 +75,45 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         navbar.setBackgroundImage(UIImage(), for: .default)
         navbar.shadowImage = UIImage()
         navbar.isTranslucent = true
-        
+
+        menuButton.menu = menu
+
         self.view.backgroundColor = .clear
         
-        menuButton.menu = menu
+        toolBar.barTintColor = UIColor(red: 52/255, green: 109/255, blue: 179/255, alpha: 1)
+        toolBar.alpha = 0.9
+        toolBar.isTranslucent = false
+        self.view.addSubview(toolBar)
+        
+    }
+    func setUpSearchButton() -> UIButton {
+        let btn = UIButton(type: .custom)
+        btn.frame = CGRect(x: screenSize.width - 60.0, y: screenSize.height - 70.0, width: 50, height: 50)
+        btn.tintColor = .white
+        let largeConfig = UIImage.SymbolConfiguration(scale: .large)
+        btn.setImage(UIImage(systemName:"list.bullet", withConfiguration: largeConfig), for: .normal)
+        btn.addTarget(self, action: #selector(goSearchView), for: UIControl.Event.touchUpInside)
+
+        return btn
+    }
+    
+    @objc func goSearchView() {
+        // Go to SearchViewController and passing variables from this controller
+        let story = UIStoryboard(name: "Main", bundle: nil)
+        let controller = story.instantiateViewController(identifier: "SearchViewId") as! SearchViewController
+        controller.modalPresentationStyle = .fullScreen
+        controller.current = self.current
+        controller.city = self.city
+        controller.unitIsCelsius = self.unitIsCelsius
+        self.present(controller, animated: true, completion: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupLocation()
+        let toolbarRightButton = setUpSearchButton()
+        self.view.addSubview(toolbarRightButton)
+
     }
     
     func setupLocation() {
@@ -229,8 +262,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 func convertTemp(temp: Double, from inputTempType: UnitTemperature, to outputTempType: UnitTemperature) -> String {
     let mf = MeasurementFormatter()
     mf.numberFormatter.maximumFractionDigits = 0
-    mf.unitOptions = .providedUnit
-    let input = Measurement(value: temp, unit: inputTempType)
+
+    mf.unitOptions = .temperatureWithoutUnit
+
+    let input = Measurement(value: temp,  unit: inputTempType)
     let output = input.converted(to: outputTempType)
     return mf.string(from: output)
 }

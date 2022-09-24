@@ -5,6 +5,7 @@
 //  Created by Tatiana Simmer on 21/07/2022.
 //
 
+import GooglePlaces
 import UIKit
 
 @main
@@ -13,7 +14,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+
+        let apiKey = Bundle.main.object(forInfoDictionaryKey: "GOOGLE_API_KEY") as? String
+        
+        guard let key = apiKey, !key.isEmpty else {
+            print("Google API key does not exist")
+            return false
+        }
+
+        GMSPlacesClient.provideAPIKey(key)
+        
         return true
     }
 
