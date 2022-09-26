@@ -15,7 +15,7 @@ class SearchViewController: UIViewController, UISearchResultsUpdating, UISearchC
     var city = ""
     var unitIsCelsius = true
     let screenSize: CGRect = UIScreen.main.bounds
-    var places: [Place] = []
+    var searchResultPlaces: [Place] = []
     
     let searchVC = UISearchController()
     let navBar = UINavigationBar()
@@ -76,7 +76,7 @@ class SearchViewController: UIViewController, UISearchResultsUpdating, UISearchC
         GooglePlacesManager.shared.findPlaces(query: query) { result in
             switch result {
             case .success(let newPlaces):
-                self.places = newPlaces
+                self.searchResultPlaces = newPlaces
                 self.searchResultTableView.isHidden = false
                 self.searchResultTableView.reloadData()
             case .failure(let error):
@@ -101,7 +101,7 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         if tableView == CityTableView {
             return 3
         } else if tableView == searchResultTableView {
-            return places.count
+            return searchResultPlaces.count
         }
         return 1
     }
@@ -122,7 +122,7 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
             
         } else if tableView == searchResultTableView {
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = places[indexPath.row].name
+            cell.textLabel?.text = searchResultPlaces[indexPath.row].name
             cell.backgroundColor = .black
             cell.textLabel?.textColor = .white
             return cell
@@ -136,7 +136,7 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         } else if tableView == searchResultTableView {
             tableView.deselectRow(at: indexPath, animated: true)
             
-            let place: Place = places[indexPath.row]
+            let place: Place = searchResultPlaces[indexPath.row]
             // TODO: Open the weather for that city with buttons add and cancel
             print(place)
         }
