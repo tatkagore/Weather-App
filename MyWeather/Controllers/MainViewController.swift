@@ -11,8 +11,8 @@ import MapKit
 
 class MainViewController: UIViewController, UIScrollViewDelegate, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
     
-    @IBOutlet weak var toolBar: UIToolbar!
     @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var toolBar: UIToolbar!
     @IBOutlet weak var pageControl: UIPageControl!
     
     private lazy var celsius = UIAction(title: "Celsius", image: UIImage(named: "celsius"), state: .on) { action in
@@ -87,7 +87,6 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UITableViewDel
             
             slide.table.delegate = self
             slide.table.dataSource = self
-            slide.table.backgroundColor = .clear
             slide.table.allowsSelection = false
             slide.table.backgroundColor = .clear
             
@@ -97,9 +96,9 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UITableViewDel
     
     func setupSlideScrollView() {
         for i in 0 ..< slides.count {
-            let xCoordinate = view.frame.width * CGFloat(i)
-            contentWidth += view.frame.width
-            slides[i].frame = CGRect(x: xCoordinate, y: 0, width: view.frame.width, height: view.frame.height)
+            let xCoordinate = screenSize.width * CGFloat(i)
+            contentWidth += screenSize.width
+            slides[i].frame = CGRect(x: xCoordinate, y: 0, width: screenSize.width, height: view.frame.height)
             scrollView.addSubview(slides[i])
         }
         scrollView.contentSize = CGSize(width: contentWidth, height: view.frame.height)
