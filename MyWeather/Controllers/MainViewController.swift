@@ -98,8 +98,10 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UITableViewDel
         for i in 0 ..< slides.count {
             let xCoordinate = screenSize.width * CGFloat(i)
             contentWidth += screenSize.width
+            print(screenSize.width, xCoordinate)
             slides[i].frame = CGRect(x: xCoordinate, y: 0, width: screenSize.width, height: view.frame.height)
             scrollView.addSubview(slides[i])
+            slides[i].center = CGPointMake(scrollView.bounds.size.width * 0.5 + screenSize.width * CGFloat(i), slides[i].center.y);
         }
         scrollView.contentSize = CGSize(width: contentWidth, height: view.frame.height)
     }
@@ -230,10 +232,10 @@ class MainViewController: UIViewController, UIScrollViewDelegate, UITableViewDel
     
     func createTableHeader() -> UIView {
         let headerView = UIView(frame: CGRect(x: 0, y: 20, width: screenSize.width, height: screenSize.width))
-        let locationLabel = UILabel(frame: CGRect(x: 10, y: 30, width: screenSize.width-20, height: headerView.frame.size.height/5))
-        let summaryLabel = UILabel(frame: CGRect(x: 10, y: 20+locationLabel.frame.size.height, width: screenSize.width-20, height: headerView.frame.size.height/5))
-        let imageView = UIImageView(frame: CGRect(x: 10, y: 20+locationLabel.frame.size.height+summaryLabel.frame.size.height, width: screenSize.width-20, height: headerView.frame.size.height/5));
-        let tempLabel = UILabel(frame: CGRect(x: 10, y: 20+locationLabel.frame.size.height+summaryLabel.frame.size.height+imageView.frame.size.height, width: screenSize.width-20, height: headerView.frame.size.height*2/5))
+        let locationLabel = UILabel(frame: CGRect(x: 10, y: 30, width: screenSize.width, height: headerView.frame.size.height/5))
+        let summaryLabel = UILabel(frame: CGRect(x: 10, y: 20+locationLabel.frame.size.height, width: screenSize.width, height: headerView.frame.size.height/5))
+        let imageView = UIImageView(frame: CGRect(x: 10, y: 20+locationLabel.frame.size.height+summaryLabel.frame.size.height, width: screenSize.width, height: headerView.frame.size.height/5));
+        let tempLabel = UILabel(frame: CGRect(x: 10, y: 20+locationLabel.frame.size.height+summaryLabel.frame.size.height+imageView.frame.size.height, width: screenSize.width, height: headerView.frame.size.height*2/5))
         
         headerView.addSubview(locationLabel)
         headerView.addSubview(tempLabel)
