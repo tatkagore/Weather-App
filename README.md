@@ -1,8 +1,13 @@
 
 
-https://user-images.githubusercontent.com/101064028/182200719-b2a46a98-3ab7-4dc7-9cf5-bc6cd618b29d.mov
+
+
+https://user-images.githubusercontent.com/101064028/194719629-bf6e34e7-dbc6-4ad8-8cfc-371f6928b58d.mp4
+
 
 
 
 # Weather-App
-Weather App 
+
+Just a Weather App with what I consider major features. Using OpenWeather and Google Places APIs.
+
