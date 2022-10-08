@@ -11,11 +11,11 @@ class SearchViewController: UIViewController, UISearchResultsUpdating, UISearchC
 
     @IBOutlet weak var CityTableView: UITableView!
     
-    var current: CurrentWeather?
-    var city = ""
+    var pageControl: UIPageControl!
     var unitIsCelsius = true
     let screenSize: CGRect = UIScreen.main.bounds
     var searchResultPlaces: [Place] = []
+    var places: [Place] = []
     
     let searchVC = UISearchController()
     let navBar = UINavigationBar()
@@ -27,6 +27,8 @@ class SearchViewController: UIViewController, UISearchResultsUpdating, UISearchC
         table.backgroundView?.backgroundColor = .black
         return table
     }()
+    
+    let newPlaceViewController = NewPlaceViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,7 +101,7 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == CityTableView {
-            return 3
+            return places.count
         } else if tableView == searchResultTableView {
             return searchResultPlaces.count
         }
@@ -108,13 +110,22 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView == CityTableView {
-            guard let currentWeather = self.current else {
-                return CityCell()
-            }
+            
+            let place = places[indexPath.row]
+            let currentWeather = place.current
             
             let cell = CityTableView.dequeueReusableCell(withIdentifier: "CityCell", for: indexPath) as! CityCell
-            cell.CityLabel.text = "\(self.city)"
-            cell.SumUpLabel.text = "\(self.current?.weather[0].description.capitalized ?? "")"
+            
+            if indexPath.row == 0 {
+                cell.Title.text = "My Location"
+                cell.Subtitle.text = "\(place.name)"
+            } else {
+                cell.Title.text = "\(place.name)"
+                // TODO : Local Time
+                cell.Subtitle.text = ""
+            }
+            
+            cell.SumUpLabel.text = "\(place.current.weather[0].description.capitalized)"
             cell.TempLabel.text = "\(convertTemp(temp: currentWeather.temp, from: UnitTemperature.kelvin, to: self.unitIsCelsius ? UnitTemperature.celsius : UnitTemperature.fahrenheit))"
             cell.FeelsLikeLabel.text =  "Feels like: \(convertTemp(temp: currentWeather.feels_like, from: UnitTemperature.kelvin, to: self.unitIsCelsius ? UnitTemperature.celsius : UnitTemperature.fahrenheit))"
             cell.CityView.layer.cornerRadius = 20
@@ -132,13 +143,33 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if tableView == CityTableView {
-            // TODO: Open the details for that city
+            // Go to that place's slide
+            self.pageControl.currentPage = indexPath.row
+            weak var mainViewController = self.presentingViewController as? MainViewController
+            mainViewController?.scrollView.contentOffset.x = screenSize.width * CGFloat(indexPath.row)
+            self.dismiss(animated: true, completion: nil)
         } else if tableView == searchResultTableView {
-            tableView.deselectRow(at: indexPath, animated: true)
+            self.searchVC.isActive = false
+
+            var place: Place = searchResultPlaces[indexPath.row]
             
-            let place: Place = searchResultPlaces[indexPath.row]
-            // TODO: Open the weather for that city with buttons add and cancel
-            print(place)
+            GooglePlacesManager.shared.resolveLocation(place: place) { [self] result in
+                switch result {
+                case .success(let coordinates):
+                    place.lat = coordinates.latitude
+                    place.lon = coordinates.longitude
+                    place.name = String(place.name.split(separator: ",")[0])
+                    
+                    // Open the weather for that city with buttons add and cancel
+                    self.newPlaceViewController.modalPresentationStyle = .fullScreen
+                    self.newPlaceViewController.place = place
+                    self.newPlaceViewController.unitIsCelsius = unitIsCelsius
+                    self.present(newPlaceViewController, animated: false, completion: nil)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+                
         }
     }
 }

@@ -9,8 +9,9 @@ import UIKit
 
 class CityCell: UITableViewCell {
 
+    @IBOutlet weak var Title: UILabel!
     @IBOutlet weak var CityView: UIView!
-    @IBOutlet weak var CityLabel: UILabel!
+    @IBOutlet weak var Subtitle: UILabel!
     @IBOutlet weak var SumUpLabel: UILabel!
     @IBOutlet weak var TempLabel: UILabel!
     @IBOutlet weak var FeelsLikeLabel: UILabel!

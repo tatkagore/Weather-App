@@ -11,8 +11,6 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         let apiKey = Bundle.main.object(forInfoDictionaryKey: "GOOGLE_API_KEY") as? String
